@@ -13,4 +13,9 @@ public class Knight extends Piece {
         return 320;
     }
 
+    @Override
+    protected char getSymbol() {
+        return 'N';
+    }
+
 }

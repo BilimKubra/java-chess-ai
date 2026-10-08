@@ -13,4 +13,9 @@ public class King extends Piece {
         return 20000;
     }
 
+    @Override
+    protected char getSymbol() {
+        return 'K';
+    }
+
 }

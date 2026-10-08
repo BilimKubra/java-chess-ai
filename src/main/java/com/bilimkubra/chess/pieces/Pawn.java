@@ -13,4 +13,9 @@ public class Pawn extends Piece {
         return 100;
     }
 
+    @Override
+    protected char getSymbol() {
+        return 'P';
+    }
+
 }

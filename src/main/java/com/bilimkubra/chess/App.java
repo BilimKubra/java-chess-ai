@@ -1,10 +1,12 @@
 package com.bilimkubra.chess;
 
-/**
- * Hello world!
- */
+import com.bilimkubra.chess.core.Board;
+
 public class App {
+
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        Board board = Board.initialPosition();
+        System.out.println(board);
     }
+
 }
