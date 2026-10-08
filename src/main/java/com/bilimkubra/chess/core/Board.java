@@ -8,6 +8,9 @@ import com.bilimkubra.chess.pieces.Piece;
 import com.bilimkubra.chess.pieces.Queen;
 import com.bilimkubra.chess.pieces.Rook;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Board {
 
     private final Piece[][] squares = new Piece[8][8];
@@ -32,6 +35,20 @@ public class Board {
 
     public boolean isEmpty(Position position) {
         return getPiece(position) == null;
+    }
+
+    /** Verilen renkteki tüm taşların sözde-yasal hamleleri. */
+    public List<Move> getPseudoLegalMoves(Color color) {
+        List<Move> moves = new ArrayList<>();
+        for (int file = 0; file < 8; file++) {
+            for (int rank = 0; rank < 8; rank++) {
+                Piece piece = squares[file][rank];
+                if (piece != null && piece.getColor() == color) {
+                    moves.addAll(piece.getPseudoLegalMoves(this, new Position(file, rank)));
+                }
+            }
+        }
+        return moves;
     }
 
     /** Tahtayı beyazın bakış açısından (8. sıra üstte) metin olarak çizer. */
