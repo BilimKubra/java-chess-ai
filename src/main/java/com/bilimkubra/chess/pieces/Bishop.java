@@ -13,4 +13,9 @@ public class Bishop extends Piece {
         return 330;
     }
 
+    @Override
+    protected char getSymbol() {
+        return 'B';
+    }
+
 }

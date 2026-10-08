@@ -13,4 +13,9 @@ public class Rook extends Piece {
         return 500;
     }
 
+    @Override
+    protected char getSymbol() {
+        return 'R';
+    }
+
 }
