@@ -34,6 +34,22 @@ public class Board {
         return getPiece(position) == null;
     }
 
+    /** Tahtayı beyazın bakış açısından (8. sıra üstte) metin olarak çizer. */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int rank = 7; rank >= 0; rank--) {
+            sb.append(rank + 1).append("  ");
+            for (int file = 0; file < 8; file++) {
+                Piece piece = squares[file][rank];
+                sb.append(piece == null ? "." : piece.toString()).append(' ');
+            }
+            sb.append('\n');
+        }
+        sb.append("\n   a b c d e f g h\n");
+        return sb.toString();
+    }
+
     private void placePawns(Color color, int rank) {
         for (int file = 0; file < 8; file++) {
             setPiece(new Position(file, rank), new Pawn(color));
