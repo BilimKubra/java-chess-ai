@@ -8,12 +8,19 @@ import com.bilimkubra.chess.pieces.Piece;
 import com.bilimkubra.chess.pieces.Queen;
 import com.bilimkubra.chess.pieces.Rook;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 public class Board {
 
+    /** Oynanmış bir hamlenin, geri alınabilmesi için gereken tüm bilgisi. */
+    private record MoveRecord(Move move, Piece moved, Piece captured) {
+    }
+
     private final Piece[][] squares = new Piece[8][8];
+    private final Deque<MoveRecord> history = new ArrayDeque<>();
 
     /** Standart satranç başlangıç dizilimiyle hazır bir tahta üretir. */
     public static Board initialPosition() {
@@ -35,6 +42,31 @@ public class Board {
 
     public boolean isEmpty(Position position) {
         return getPiece(position) == null;
+    }
+
+    /** Hamleyi tahtada oynar ve geri alınabilmesi için geçmişe kaydeder. */
+    public void makeMove(Move move) {
+        Piece moved = getPiece(move.getFrom());
+        if (moved == null) {
+            throw new IllegalArgumentException("Başlangıç karesinde taş yok: " + move.getFrom());
+        }
+        Piece captured = getPiece(move.getTo());
+
+        setPiece(move.getTo(), moved);
+        setPiece(move.getFrom(), null);
+
+        history.push(new MoveRecord(move, moved, captured));
+    }
+
+    /** Son oynanan hamleyi geri alır; alınan taş varsa yerine koyar. */
+    public void undoMove() {
+        if (history.isEmpty()) {
+            throw new IllegalStateException("Geri alınacak hamle yok");
+        }
+        MoveRecord last = history.pop();
+
+        setPiece(last.move().getFrom(), last.moved());
+        setPiece(last.move().getTo(), last.captured());
     }
 
     /** Verilen renkteki tüm taşların sözde-yasal hamleleri. */
