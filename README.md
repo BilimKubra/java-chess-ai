@@ -1,5 +1,6 @@
 # ♟️ Java Chess AI
 
+![CI](https://github.com/BilimKubra/java-chess-ai/actions/workflows/ci.yml/badge.svg)
 ![Java](https://img.shields.io/badge/Java-21-orange?logo=openjdk)
 ![Maven](https://img.shields.io/badge/Build-Maven-blue?logo=apachemaven)
 ![Status](https://img.shields.io/badge/Status-In%20Development-yellow)
