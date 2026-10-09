@@ -51,14 +51,14 @@ Hiçbir hazır satranç veya yapay zekâ kütüphanesi kullanılmamıştır; tü
 ## 🗺️ Yol Haritası
 
 **Aşama 1 — Oyun Motoru**
-- [ ] `Position`, `Move`, `Color` temel sınıfları
-- [ ] Soyut `Piece` sınıfı ve 6 taş türü
-- [ ] `Board` sınıfı ve başlangıç dizilimi
-- [ ] Taşların temel hamle kuralları
-- [ ] Şah kontrolü ve yasal hamle filtresi
+- [x] `Position`, `Move`, `Color` temel sınıfları
+- [x] Soyut `Piece` sınıfı ve 6 taş türü
+- [x] `Board` sınıfı ve başlangıç dizilimi
+- [x] Taşların temel hamle kuralları
+- [x] Şah kontrolü ve yasal hamle filtresi
 - [ ] Özel hamleler: rok, geçerken alma, terfi
-- [ ] Oyun sonu tespiti: şah mat, pat
-- [ ] Konsoldan iki kişilik oyun
+- [x] Oyun sonu tespiti: şah mat, pat
+- [x] Konsoldan iki kişilik oyun
 
 **Aşama 2 — Yapay Zekâ**
 - [ ] `Player` arayüzü, `HumanPlayer` ve `AIPlayer`
