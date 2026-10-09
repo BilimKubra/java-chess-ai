@@ -1,10 +1,11 @@
 package com.bilimkubra.chess;
 
+import com.bilimkubra.chess.ai.MaterialEvaluator;
+import com.bilimkubra.chess.ai.MinimaxPlayer;
 import com.bilimkubra.chess.core.Board;
 import com.bilimkubra.chess.game.Game;
 import com.bilimkubra.chess.player.HumanPlayer;
 import com.bilimkubra.chess.player.Player;
-import com.bilimkubra.chess.player.RandomPlayer;
 
 import java.util.Scanner;
 
@@ -14,7 +15,7 @@ public class App {
         Scanner keyboard = new Scanner(System.in);
 
         Player white = new HumanPlayer(keyboard, "Kübra");
-        Player black = new RandomPlayer();
+        Player black = new MinimaxPlayer(new MaterialEvaluator(), 3);
 
         new Game(Board.initialPosition(), white, black).play(500, true);
     }
