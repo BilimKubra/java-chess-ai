@@ -56,7 +56,7 @@ Hiçbir hazır satranç veya yapay zekâ kütüphanesi kullanılmamıştır; tü
 - [x] `Board` sınıfı ve başlangıç dizilimi
 - [x] Taşların temel hamle kuralları
 - [x] Şah kontrolü ve yasal hamle filtresi
-- [ ] Özel hamleler: rok, geçerken alma, terfi
+- [x] Özel hamleler: rok, geçerken alma, terfi
 - [x] Oyun sonu tespiti: şah mat, pat
 - [x] Konsoldan iki kişilik oyun
 

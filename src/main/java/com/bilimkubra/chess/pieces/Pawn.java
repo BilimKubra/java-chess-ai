@@ -10,6 +10,9 @@ import java.util.List;
 
 public class Pawn extends Piece {
 
+    /** Terfide seçilebilecek taşlar. */
+    private static final char[] PROMOTION_PIECES = {'Q', 'R', 'B', 'N'};
+
     public Pawn(Color color) {
         super(color);
     }
@@ -34,7 +37,7 @@ public class Pawn extends Piece {
         if (from.canOffset(0, forward)) {
             Position oneStep = from.offset(0, forward);
             if (board.isEmpty(oneStep)) {
-                moves.add(new Move(from, oneStep));
+                addMove(moves, from, oneStep);
 
                 // 2) İlk hamlede iki kare ileri: arada ve hedefte taş olmamalı
                 if (from.getRank() == startRank) {
@@ -46,17 +49,31 @@ public class Pawn extends Piece {
             }
         }
 
-        // 3) Çapraz alma: sadece rakip taş varsa
+        // 3) Çapraz alma: rakip taş varsa veya geçerken alma karesiyse
         for (int side : new int[]{-1, 1}) {
             if (from.canOffset(side, forward)) {
                 Position target = from.offset(side, forward);
                 if (isEnemy(board.getPiece(target))) {
+                    addMove(moves, from, target);
+                } else if (target.equals(board.getEnPassantTarget())) {
                     moves.add(new Move(from, target));
                 }
             }
         }
 
         return moves;
+    }
+
+    /** Son sıraya ulaşan piyon için 4 terfi hamlesi, diğer durumlarda normal hamle ekler. */
+    private void addMove(List<Move> moves, Position from, Position to) {
+        boolean lastRank = to.getRank() == 0 || to.getRank() == 7;
+        if (lastRank) {
+            for (char piece : PROMOTION_PIECES) {
+                moves.add(new Move(from, to, piece));
+            }
+        } else {
+            moves.add(new Move(from, to));
+        }
     }
 
 }
