@@ -8,12 +8,19 @@ import com.bilimkubra.chess.pieces.Piece;
 import com.bilimkubra.chess.pieces.Queen;
 import com.bilimkubra.chess.pieces.Rook;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 public class Board {
 
+    /** Oynanmış bir hamlenin, geri alınabilmesi için gereken tüm bilgisi. */
+    private record MoveRecord(Move move, Piece moved, Piece captured) {
+    }
+
     private final Piece[][] squares = new Piece[8][8];
+    private final Deque<MoveRecord> history = new ArrayDeque<>();
 
     /** Standart satranç başlangıç dizilimiyle hazır bir tahta üretir. */
     public static Board initialPosition() {
@@ -37,6 +44,31 @@ public class Board {
         return getPiece(position) == null;
     }
 
+    /** Hamleyi tahtada oynar ve geri alınabilmesi için geçmişe kaydeder. */
+    public void makeMove(Move move) {
+        Piece moved = getPiece(move.getFrom());
+        if (moved == null) {
+            throw new IllegalArgumentException("Başlangıç karesinde taş yok: " + move.getFrom());
+        }
+        Piece captured = getPiece(move.getTo());
+
+        setPiece(move.getTo(), moved);
+        setPiece(move.getFrom(), null);
+
+        history.push(new MoveRecord(move, moved, captured));
+    }
+
+    /** Son oynanan hamleyi geri alır; alınan taş varsa yerine koyar. */
+    public void undoMove() {
+        if (history.isEmpty()) {
+            throw new IllegalStateException("Geri alınacak hamle yok");
+        }
+        MoveRecord last = history.pop();
+
+        setPiece(last.move().getFrom(), last.moved());
+        setPiece(last.move().getTo(), last.captured());
+    }
+
     /** Verilen renkteki tüm taşların sözde-yasal hamleleri. */
     public List<Move> getPseudoLegalMoves(Color color) {
         List<Move> moves = new ArrayList<>();
@@ -49,6 +81,44 @@ public class Board {
             }
         }
         return moves;
+    }
+
+    /** Verilen rengin şahı şu an rakip tarafından tehdit ediliyor mu? */
+    public boolean isInCheck(Color color) {
+        Position kingSquare = findKing(color);
+        if (kingSquare == null) {
+            return false;
+        }
+        for (Move enemyMove : getPseudoLegalMoves(color.opposite())) {
+            if (enemyMove.getTo().equals(kingSquare)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Yasal hamleler: Oynandıktan sonra kendi şahını tehdit altında bırakmayan hamleler. */
+    public List<Move> getLegalMoves(Color color) {
+        List<Move> legalMoves = new ArrayList<>();
+        for (Move move : getPseudoLegalMoves(color)) {
+            makeMove(move);
+            if (!isInCheck(color)) {
+                legalMoves.add(move);
+            }
+            undoMove();
+        }
+        return legalMoves;
+    }
+
+    /**
+     * Sırası gelen tarafa göre oyunun durumu.
+     * Yasal hamle yoksa: şah tehdit altındaysa mat, değilse pat.
+     */
+    public GameStatus getStatus(Color sideToMove) {
+        if (!getLegalMoves(sideToMove).isEmpty()) {
+            return GameStatus.ONGOING;
+        }
+        return isInCheck(sideToMove) ? GameStatus.CHECKMATE : GameStatus.STALEMATE;
     }
 
     /** Tahtayı beyazın bakış açısından (8. sıra üstte) metin olarak çizer. */
@@ -65,6 +135,18 @@ public class Board {
         }
         sb.append("\n   a b c d e f g h\n");
         return sb.toString();
+    }
+
+    private Position findKing(Color color) {
+        for (int file = 0; file < 8; file++) {
+            for (int rank = 0; rank < 8; rank++) {
+                Piece piece = squares[file][rank];
+                if (piece instanceof King && piece.getColor() == color) {
+                    return new Position(file, rank);
+                }
+            }
+        }
+        return null;
     }
 
     private void placePawns(Color color, int rank) {
