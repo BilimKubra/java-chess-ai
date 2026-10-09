@@ -83,6 +83,33 @@ public class Board {
         return moves;
     }
 
+    /** Verilen rengin şahı şu an rakip tarafından tehdit ediliyor mu? */
+    public boolean isInCheck(Color color) {
+        Position kingSquare = findKing(color);
+        if (kingSquare == null) {
+            return false;
+        }
+        for (Move enemyMove : getPseudoLegalMoves(color.opposite())) {
+            if (enemyMove.getTo().equals(kingSquare)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Yasal hamleler: Oynandıktan sonra kendi şahını tehdit altında bırakmayan hamleler. */
+    public List<Move> getLegalMoves(Color color) {
+        List<Move> legalMoves = new ArrayList<>();
+        for (Move move : getPseudoLegalMoves(color)) {
+            makeMove(move);
+            if (!isInCheck(color)) {
+                legalMoves.add(move);
+            }
+            undoMove();
+        }
+        return legalMoves;
+    }
+
     /** Tahtayı beyazın bakış açısından (8. sıra üstte) metin olarak çizer. */
     @Override
     public String toString() {
@@ -97,6 +124,18 @@ public class Board {
         }
         sb.append("\n   a b c d e f g h\n");
         return sb.toString();
+    }
+
+    private Position findKing(Color color) {
+        for (int file = 0; file < 8; file++) {
+            for (int rank = 0; rank < 8; rank++) {
+                Piece piece = squares[file][rank];
+                if (piece instanceof King && piece.getColor() == color) {
+                    return new Position(file, rank);
+                }
+            }
+        }
+        return null;
     }
 
     private void placePawns(Color color, int rank) {
