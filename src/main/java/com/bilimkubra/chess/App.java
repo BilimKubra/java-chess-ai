@@ -1,6 +1,6 @@
 package com.bilimkubra.chess;
 
-import com.bilimkubra.chess.ai.MaterialEvaluator;
+import com.bilimkubra.chess.ai.PositionalEvaluator;
 import com.bilimkubra.chess.ai.AlphaBetaPlayer;
 import com.bilimkubra.chess.core.Board;
 import com.bilimkubra.chess.game.Game;
@@ -15,7 +15,7 @@ public class App {
         Scanner keyboard = new Scanner(System.in);
 
         Player white = new HumanPlayer(keyboard, "Kübra");
-        Player black = new AlphaBetaPlayer(new MaterialEvaluator(), 4);
+        Player black = new AlphaBetaPlayer(new PositionalEvaluator(), 4);
 
         new Game(Board.initialPosition(), white, black).play(500, true);
     }
