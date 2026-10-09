@@ -110,6 +110,17 @@ public class Board {
         return legalMoves;
     }
 
+    /**
+     * Sırası gelen tarafa göre oyunun durumu.
+     * Yasal hamle yoksa: şah tehdit altındaysa mat, değilse pat.
+     */
+    public GameStatus getStatus(Color sideToMove) {
+        if (!getLegalMoves(sideToMove).isEmpty()) {
+            return GameStatus.ONGOING;
+        }
+        return isInCheck(sideToMove) ? GameStatus.CHECKMATE : GameStatus.STALEMATE;
+    }
+
     /** Tahtayı beyazın bakış açısından (8. sıra üstte) metin olarak çizer. */
     @Override
     public String toString() {
