@@ -62,11 +62,11 @@ Hiçbir hazır satranç veya yapay zekâ kütüphanesi kullanılmamıştır; tü
 
 **Aşama 2 — Yapay Zekâ**
 - [ ] `Player` arayüzü, `HumanPlayer` ve `AIPlayer`
-- [ ] Malzeme tabanlı değerlendirme fonksiyonu
-- [ ] Minimax
-- [ ] Alpha-Beta budama
-- [ ] Taş-kare tabloları (piece-square tables)
-- [ ] Hamle sıralama (MVV-LVA)
+- [x] Malzeme tabanlı değerlendirme fonksiyonu
+- [x] Minimax
+- [x] Alpha-Beta budama
+- [x] Taş-kare tabloları (piece-square tables)
+- [x] Hamle sıralama (MVV-LVA)
 
 **Aşama 3 — İleri Seviye**
 - [ ] Kademeli derinleştirme ve zaman sınırı
