@@ -3,7 +3,8 @@
 ![CI](https://github.com/BilimKubra/java-chess-ai/actions/workflows/ci.yml/badge.svg)
 ![Java](https://img.shields.io/badge/Java-21-orange?logo=openjdk)
 ![Maven](https://img.shields.io/badge/Build-Maven-blue?logo=apachemaven)
-![Status](https://img.shields.io/badge/Status-In%20Development-yellow)
+![Version](https://img.shields.io/badge/version-1.0.0-brightgreen)
+![Tests](https://img.shields.io/badge/tests-73%20passing-brightgreen)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 Nesne Yönelimli Programlama (NYP) prensipleriyle Java'da sıfırdan yazılmış, **Minimax + Alpha-Beta Pruning** algoritmalarını kullanan bir yapay zekâ rakibe sahip satranç oyunu.
@@ -20,6 +21,7 @@ Hiçbir hazır satranç veya yapay zekâ kütüphanesi kullanılmamıştır; tü
 ## 📑 İçindekiler
 
 - [Özellikler](#-özellikler)
+- [Nasıl Oynanır](#-nasıl-oynanır)
 - [Yol Haritası](#️-yol-haritası)
 - [Mimari ve NYP Tasarımı](#️-mimari-ve-nyp-tasarımı)
 - [Kullanılan Tasarım Desenleri](#-kullanılan-tasarım-desenleri)
@@ -34,6 +36,7 @@ Hiçbir hazır satranç veya yapay zekâ kütüphanesi kullanılmamıştır; tü
   - [8. Transpozisyon Tablosu ve Zobrist Hashing](#8-transpozisyon-tablosu-ve-zobrist-hashing)
 - [Kurulum ve Çalıştırma](#-kurulum-ve-çalıştırma)
 - [Testler ve Perft Doğrulaması](#-testler-ve-perft-doğrulaması)
+- [Sonuçlar](#-sonuçlar)
 - [Proje Yapısı](#-proje-yapısı)
 - [Kaynaklar](#-kaynaklar)
 
@@ -41,12 +44,55 @@ Hiçbir hazır satranç veya yapay zekâ kütüphanesi kullanılmamıştır; tü
 
 ## ✨ Özellikler
 
-- Tüm satranç kuralları: rok (castling), geçerken alma (en passant), piyon terfisi (promotion), şah, şah mat ve pat
-- İnsana karşı yapay zekâ ve yapay zekâya karşı yapay zekâ modları
-- Ayarlanabilir zorluk seviyesi (arama derinliği)
-- Hamle geri alma (undo)
-- Konsol arayüzü, ardından JavaFX grafik arayüzü
-- JUnit birim testleri ve perft ile hamle üretimi doğrulaması
+- **Tüm satranç kuralları:** rok, geçerken alma, piyon terfisi, şah, şah mat ve pat
+- **Yapay zekâ rakip:** Alpha-Beta budamalı Minimax araması + konumsal değerlendirme
+- **Ayarlanabilir zorluk:** Arama derinliği tek parametreyle değişir
+- **Tak-çıkar oyuncular:** İnsan, rastgele oyuncu, Minimax ve Alpha-Beta AI aynı `Player` arayüzünü uygular
+- **FEN desteği:** Herhangi bir pozisyon tek satırla yüklenebilir
+- **Konsol arayüzü:** Hamleler `e2e4` biçiminde yazılır
+- **73 JUnit testi** ve standart referans pozisyonlarla **perft doğrulaması**
+- **CI:** Her push ve Pull Request'te GitHub Actions ile otomatik test
+
+## 🎮 Nasıl Oynanır
+
+```bash
+mvn -q compile exec:java
+```
+
+Beyaz taşlarla sen, siyah taşlarla yapay zekâ oynar. Hamleleri **başlangıç ve bitiş karesiyle** yaz:
+
+| Hamle | Yazılışı |
+|---|---|
+| Normal hamle | `e2e4`, `g1f3` |
+| Rok (kısa / uzun) | `e1g1` / `e1c1` (şahın hareketi) |
+| Piyon terfisi | `e7e8q` (vezir), `e7e8n` (at), `r` kale, `b` fil |
+| Geçerken alma | Piyonun gittiği kare: `e5d6` |
+
+```text
+8  r n b q k b n r
+7  p p p p p p p p
+6  . . . . . . . .
+5  . . . . . . . .
+4  . . . . . . . .
+3  . . . . . . . .
+2  P P P P P P P P
+1  R N B Q K B N R
+
+   a b c d e f g h
+
+Kübra (WHITE) hamlen (ör. e2e4, terfi: e7e8q): e2e4
+```
+
+Büyük harfler beyaz, küçük harfler siyah taşlardır (K şah, Q vezir, R kale, B fil, N at, P piyon). Çıkmak için `Ctrl + C`.
+
+**Rakibi değiştirmek:** `App.java` içinde tek satır:
+
+```java
+Player black = new AlphaBetaPlayer(new PositionalEvaluator(), 4);   // varsayılan: derinlik 4
+Player black = new AlphaBetaPlayer(new PositionalEvaluator(), 2);   // daha kolay
+Player black = new RandomPlayer();                                    // rastgele oynayan rakip
+Player black = new HumanPlayer(keyboard, "Arkadaş");                  // iki kişilik oyun
+```
 
 ## 🗺️ Yol Haritası
 
@@ -61,14 +107,14 @@ Hiçbir hazır satranç veya yapay zekâ kütüphanesi kullanılmamıştır; tü
 - [x] Konsoldan iki kişilik oyun
 
 **Aşama 2 — Yapay Zekâ**
-- [ ] `Player` arayüzü, `HumanPlayer` ve `AIPlayer`
+- [x] `Player` arayüzü, `HumanPlayer`, `RandomPlayer` ve AI oyuncular
 - [x] Malzeme tabanlı değerlendirme fonksiyonu
 - [x] Minimax
 - [x] Alpha-Beta budama
 - [x] Taş-kare tabloları (piece-square tables)
-- [x] Hamle sıralama (MVV-LVA)
+- [x] Hamle sıralama (önce değerli taşı alan hamleler)
 
-**Aşama 3 — İleri Seviye**
+**Aşama 3 — İleri Seviye** *(v1.0 sonrası)*
 - [ ] Kademeli derinleştirme ve zaman sınırı
 - [ ] Sessizlik araması
 - [ ] Zobrist hashing ve transpozisyon tablosu
@@ -85,19 +131,12 @@ Proje iki ana katmandan oluşur: **oyun motoru** (kurallar) ve **yapay zekâ** (
 classDiagram
     class Piece {
         <<abstract>>
-        #Color color
-        #Position position
-        +getColor() Color
+        -Color color
         +getValue() int
-        +getPseudoLegalMoves(Board) List~Move~
+        +getPseudoLegalMoves(Board, Position) List~Move~
+        #getSymbol() char
+        #stepMoves() / slideMoves()
     }
-    class Pawn
-    class Knight
-    class Bishop
-    class Rook
-    class Queen
-    class King
-
     Piece <|-- Pawn
     Piece <|-- Knight
     Piece <|-- Bishop
@@ -105,49 +144,48 @@ classDiagram
     Piece <|-- Queen
     Piece <|-- King
 
+    class PieceFactory {
+        +fromSymbol(char) Piece$
+    }
+
     class Board {
         -Piece[][] squares
-        +getPiece(Position) Piece
+        -Deque history
+        +fromFen(String) Board$
         +makeMove(Move)
         +undoMove()
         +getLegalMoves(Color) List~Move~
         +isInCheck(Color) boolean
+        +getStatus(Color) GameStatus
     }
+    Board "1" o-- "*" Piece
+    Board ..> PieceFactory
 
     class Player {
         <<interface>>
-        +chooseMove(Board) Move
-    }
-    class HumanPlayer
-    class AIPlayer {
-        -SearchStrategy strategy
-        -Evaluator evaluator
+        +chooseMove(Board, Color) Move
+        +getName() String
     }
     Player <|.. HumanPlayer
-    Player <|.. AIPlayer
-
-    class SearchStrategy {
-        <<interface>>
-        +findBestMove(Board, int depth) Move
-    }
-    class MinimaxSearch
-    class AlphaBetaSearch
-    SearchStrategy <|.. MinimaxSearch
-    SearchStrategy <|.. AlphaBetaSearch
+    Player <|.. RandomPlayer
+    Player <|.. MinimaxPlayer
+    Player <|.. AlphaBetaPlayer
 
     class Evaluator {
         <<interface>>
         +evaluate(Board) int
     }
+    Evaluator <|.. MaterialEvaluator
+    Evaluator <|.. PositionalEvaluator
+    PositionalEvaluator o-- MaterialEvaluator
+    MinimaxPlayer --> Evaluator
+    AlphaBetaPlayer --> Evaluator
 
-    Board "1" o-- "*" Piece
-    AIPlayer --> SearchStrategy
-    AIPlayer --> Evaluator
     class Game {
         -Board board
         -Player white
         -Player black
-        +play()
+        +play(int, boolean) GameStatus
     }
     Game --> Board
     Game --> Player
@@ -158,17 +196,21 @@ classDiagram
 | Kavram | Projedeki Karşılığı |
 |---|---|
 | **Soyutlama** | `Piece` soyut sınıfı "hamle üretebilen bir taş" kavramını tanımlar, ama nasıl hamle ürettiğini alt sınıflara bırakır. |
-| **Kalıtım** | `Pawn`, `Knight`, `Queen` vb. ortak alanları (renk, konum) ve davranışları `Piece`'ten devralır. |
-| **Polimorfizm** | `for (Piece p : pieces) p.getPseudoLegalMoves(board)` çağrısı, taşın türünü bilmeden doğru kuralı çalıştırır. `Player` arayüzü sayesinde `Game` sınıfı insanla da yapay zekâyla da aynı şekilde çalışır. |
+| **Kalıtım** | `Pawn`, `Knight`, `Queen` vb. ortak alanı (renk) ve davranışları (`stepMoves`, `slideMoves`, `toString`) `Piece`'ten devralır. |
+| **Polimorfizm** | `piece.getPseudoLegalMoves(board, square)` çağrısı, taşın türünü bilmeden doğru kuralı çalıştırır. `Player` arayüzü sayesinde `Game` sınıfı insanla da yapay zekâyla da aynı şekilde çalışır. |
 | **Kapsülleme** | `Board`, tahtanın iç dizisini (`Piece[][]`) gizler; dışarıdan yalnızca kuralları koruyan metotlarla değiştirilebilir. |
-| **Arayüzler** | `Player`, `SearchStrategy`, `Evaluator` — farklı uygulamalar birbirinin yerine takılabilir. |
+| **Arayüzler** | `Player` ve `Evaluator` — farklı uygulamalar birbirinin yerine takılabilir. |
+| **Kompozisyon** | `Board` taşlara sahiptir; `PositionalEvaluator`, malzeme hesabını içindeki `MaterialEvaluator`'a devreder. |
 
 ## 🧩 Kullanılan Tasarım Desenleri
 
-- **Strategy:** `SearchStrategy` ve `Evaluator` arayüzleri sayesinde arama algoritması ve değerlendirme fonksiyonu çalışma anında değiştirilebilir (örneğin kolay seviyede basit değerlendirme, zor seviyede gelişmiş değerlendirme).
-- **Command:** Her `Move` nesnesi, tahtaya uygulanabilen ve geri alınabilen bir komuttur. Hamle geçmişi bir yığında (stack) tutulur; bu hem kullanıcının "geri al" özelliğini hem de yapay zekânın arama sırasında hamleleri deneyip geri almasını sağlar.
-- **Factory:** `PieceFactory`, FEN gösterimindeki karakterlerden (`'N'`, `'q'` …) doğru taş nesnesini üretir. Piyon terfisinde de kullanılır.
-- **Observer:** Grafik arayüz, tahtadaki değişiklikleri dinleyerek kendini günceller; oyun motoru arayüzden haberdar olmak zorunda kalmaz.
+| Desen | Nerede | Ne sağlar |
+|---|---|---|
+| **Strategy** | `Evaluator`, `Player` | Değerlendirme fonksiyonu ve oyuncu türü, diğer koda dokunmadan değiştirilebilir. |
+| **Command** | `Board.makeMove` / `undoMove` + hamle geçmişi yığını | Her hamle uygulanıp geri alınabilir; AI aramasının temeli. |
+| **Factory** | `PieceFactory` | FEN harflerinden (`'N'`, `'q'`…) doğru taş nesnesi; FEN okuma ve terfide kullanılır. |
+| **Template Method** | `Piece.toString()` + soyut `getSymbol()` | Ortak gösterim mantığı üst sınıfta, taşa özgü harf alt sınıflarda. |
+| **Static Factory Method** | `Board.initialPosition()`, `Board.fromFen()` | İsmiyle ne ürettiğini anlatan nesne oluşturma. |
 
 ---
 
@@ -263,7 +305,7 @@ function minimax(board, depth, maximizingPlayer):
 
 Bu üstel büyüme yüzünden saf Minimax, birkaç hamleden daha derine bakamaz. Çözüm: budama.
 
-**Negamax varyantı:** Sıfır toplamlı oyunlarda `max(a, b) = -min(-a, -b)` olduğu için iki dal tek fonksiyonda birleştirilebilir. Değerlendirme her zaman "sırası gelen oyuncunun bakış açısından" yapılır ve alt düğümün sonucu eksiyle çarpılır. Kod daha kısa ve hatasız olur; proje ilerledikçe bu forma geçilecektir.
+**Negamax varyantı:** Sıfır toplamlı oyunlarda `max(a, b) = -min(-a, -b)` olduğu için iki dal tek fonksiyonda birleştirilebilir. Değerlendirme her zaman "sırası gelen oyuncunun bakış açısından" yapılır ve alt düğümün sonucu eksiyle çarpılır. Kod daha kısa olur; projede okunabilirlik için iki dallı (MAX/MIN) form tercih edilmiştir.
 
 ---
 
@@ -313,7 +355,7 @@ alphaBeta(board, depth, -∞, +∞, true)
 - En kötü durum (hamleler kötü sıralanmış): **O(b^d)**, Minimax ile aynı.
 - En iyi durum (en iyi hamleler önce): **O(b^(d/2))**. Yani aynı sürede **yaklaşık iki kat derinliğe** bakılabilir. Bu yüzden hamle sıralaması (bölüm 5) çok önemlidir.
 
-**Mat skorları:** Şah mat bulunduğunda çok büyük bir değer döndürülür (ör. `MATE = 100000`). Daha hızlı matı tercih etmek için kalan derinlik de eklenir: `return -(MATE + depth)` (mat edilen taraf için). Pat durumunda `0` döndürülür.
+**Mat skorları:** Şah mat bulunduğunda çok büyük bir değer döndürülür (projede `MATE_SCORE = 1_000_000`). Daha hızlı matı tercih etmek için kalan derinlik de eklenir: `return -(MATE + depth)` (mat edilen taraf için). Pat durumunda `0` döndürülür.
 
 ---
 
@@ -361,6 +403,8 @@ Değerlendirme fonksiyonu `Evaluator` arayüzünün arkasında olduğu için, fa
 
 Alpha-Beta'nın verimi, iyi hamlelerin **önce** denenmesine bağlıdır. Basit ama etkili kurallar:
 
+Projede **1. kural** uygulanmıştır (değerli taşı alan hamleler önce); diğerleri Aşama 3'e bırakılmıştır.
+
 1. **Alma hamleleri önce,** **MVV-LVA** (Most Valuable Victim – Least Valuable Attacker) sırasıyla: değerli taşı ucuz taşla almak önce denenir. Örneğin "piyon vezir alır" hamlesi, "vezir piyon alır" hamlesinden önce gelir.
 2. **Terfi hamleleri.**
 3. **Önceki aramada en iyi bulunan hamle** (kademeli derinleştirme ile birlikte).
@@ -374,6 +418,8 @@ score(move) = 10 * value(victim) − value(attacker)   // alma hamleleri için
 ---
 
 ### 6. Kademeli Derinleştirme (Iterative Deepening)
+
+> 🔜 *Aşama 3'te planlanıyor; v1.0'da uygulanmamıştır.*
 
 Sabit bir derinlik yerine önce derinlik 1, sonra 2, 3… şeklinde arama yapılır ve zaman dolduğunda son tamamlanan derinliğin sonucu kullanılır.
 
@@ -391,6 +437,8 @@ Sığ aramaları tekrar yapmak israf gibi görünse de, ağaç üstel büyüdü�
 ---
 
 ### 7. Sessizlik Araması (Quiescence Search)
+
+> 🔜 *Aşama 3'te planlanıyor; v1.0'da uygulanmamıştır.*
 
 **Ufuk etkisi (horizon effect):** Arama derinliği tam bir alma hamlesinde biterse, yapay zekâ "veziri aldım, +900!" diye düşünür ama bir sonraki hamlede veziriyle birlikte kendi taşının da gideceğini göremez.
 
@@ -414,6 +462,8 @@ function quiescence(board, alpha, beta):
 ---
 
 ### 8. Transpozisyon Tablosu ve Zobrist Hashing
+
+> 🔜 *Aşama 3'te planlanıyor; v1.0'da uygulanmamıştır.*
 
 Farklı hamle sıralarıyla aynı pozisyona ulaşılabilir (**transpozisyon**). Örneğin 1.Af3 Af6 2.Ac3 ile 1.Ac3 Af6 2.Af3 aynı pozisyondur. Aynı pozisyonu tekrar tekrar aramamak için sonuçlar bir hash tablosunda saklanır.
 
@@ -441,11 +491,9 @@ Tabloda her pozisyon için saklananlar: hash, arama derinliği, skor, skor tür�
 ```bash
 git clone https://github.com/BilimKubra/java-chess-ai.git
 cd java-chess-ai
-mvn compile
-mvn exec:java -Dexec.mainClass="com.bilimkubra.chess.App"
+mvn -q compile exec:java     # oyunu başlat
+mvn test                     # testleri çalıştır
 ```
-
-> ℹ️ Proje geliştirme aşamasındadır; çalıştırma komutları ilerleyen aşamalarda güncellenecektir.
 
 ## 🧪 Testler ve Perft Doğrulaması
 
@@ -478,24 +526,52 @@ function perft(board, depth):
 
 Sayılar tutmuyorsa, hamle üretiminde (genellikle rok, geçerken alma veya terfide) bir hata vardır.
 
+**Projede doğrulanan referans pozisyonlar** (`PerftTest`):
+
+| Pozisyon | Zorladığı kurallar | Derinlik | Beklenen | Sonuç |
+|---|---|---|---|---|
+| Başlangıç | Temel hamleler | 3 | 8.902 | ✅ |
+| Kiwipete | Rok, açmaz, terfi, geçerken alma | 2 | 2.039 | ✅ |
+| Pozisyon 3 | Geçerken alma, şah tehditleri | 3 | 2.812 | ✅ |
+| Pozisyon 4 | Terfi, rok | 2 | 264 | ✅ |
+
+## 📊 Sonuçlar
+
+**Alpha-Beta'nın etkisi** (başlangıç pozisyonu, derinlik 3, `MaterialEvaluator`):
+
+| Algoritma | İncelenen pozisyon | Oran |
+|---|---|---|
+| Minimax | 9.322 | 1× |
+| Alpha-Beta + hamle sıralama | 585 | **~16× daha az** |
+
+Aynı hamleyi bulup çok daha az pozisyon incelediği için AI, derinlik 3 yerine derinlik 4'te oynayabilmektedir.
+
+**Konumsal değerlendirmenin etkisi:** Sadece malzeme sayan AI açılışta tüm hamleleri eşit gördüğü için `a2a3` oynuyordu; taş-kare tablolarıyla `Nc3` (`b1c3`) gibi taş geliştiren hamleler seçmektedir.
+
+**Test kapsamı:** 19 test sınıfında 73 test; her Pull Request'te GitHub Actions üzerinde otomatik çalışır.
+
 ## 📁 Proje Yapısı
 
 ```text
 java-chess-ai/
+├── .github/workflows/ci.yml   # GitHub Actions: her PR'da mvn test
 ├── pom.xml
 ├── README.md
+├── LICENSE
 └── src/
     ├── main/java/com/bilimkubra/chess/
-    │   ├── App.java
-    │   ├── core/          # Board, Position, Move, Color, Game
-    │   ├── pieces/        # Piece, Pawn, Knight, Bishop, Rook, Queen, King, PieceFactory
-    │   ├── player/        # Player, HumanPlayer, AIPlayer
-    │   ├── ai/            # SearchStrategy, MinimaxSearch, AlphaBetaSearch, Evaluator
-    │   └── ui/            # ConsoleUI, (ileride) JavaFX
+    │   ├── App.java           # giriş noktası: oyuncuları seçer, oyunu başlatır
+    │   ├── core/              # Board, Position, Move, Color, GameStatus
+    │   ├── pieces/            # Piece (soyut), Pawn, Knight, Bishop, Rook, Queen, King, PieceFactory
+    │   ├── player/            # Player (arayüz), HumanPlayer, RandomPlayer
+    │   ├── ai/                # Evaluator (arayüz), Material/PositionalEvaluator, Minimax/AlphaBetaPlayer
+    │   └── game/              # Game: oyun döngüsü
     └── test/java/com/bilimkubra/chess/
-        ├── pieces/        # Taş hamle testleri
-        ├── core/          # Board ve perft testleri
-        └── ai/            # Arama ve değerlendirme testleri
+        ├── core/              # Board, kurallar, özel hamleler, perft
+        ├── pieces/            # taş değerleri, hamle üretimi
+        ├── player/            # insan ve rastgele oyuncu
+        ├── ai/                # değerlendirme ve arama
+        └── game/              # oyun döngüsü (Aptal Matı senaryosu)
 ```
 
 ## 📚 Kaynaklar
@@ -509,7 +585,7 @@ java-chess-ai/
 
 ## 📄 Lisans
 
-Bu proje MIT lisansı ile lisanslanmıştır.
+Bu proje [MIT lisansı](LICENSE) ile lisanslanmıştır.
 
 ---
 
